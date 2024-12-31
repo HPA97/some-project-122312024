@@ -91,6 +91,24 @@ export const CreateCard = (value: number, suite: CardSuit, isFrontFace: boolean,
     return newCard;
 }
 
+export const CopyCard = (card: Card | null): Card | null => {
+    if (card == null) return null;
+    return CreateCard(card.value, card.suit, card.isFrontFace, card.level);
+}
+
+const CollectBoardCardsWithBonusFromMatchState = (matchState: MatchState, isPlayerA: boolean): Card[] => {
+    const boardSlots = isPlayerA ? matchState.playerABoardSlots : matchState.playerBBoardSlots;
+    const playerHands = isPlayerA ? matchState.playerAHands : matchState.playerBHands;
+    const newHands = playerHands.cards;
+    boardSlots.forEach((card) => {
+        // TODO Include bonus depending on which slot the card was on.
+        if (card) {
+            newHands.push(CopyCard(card)!);
+        }
+    });
+    return newHands;
+}
+
 export const GameRules: Rules = {
     startingHand: [
         CreateCard(0, CardSuit.CLUBS, true, 0),
@@ -114,7 +132,10 @@ export const GameRules: Rules = {
             }
             case RoundState.IS_STEAL_POINTS: {
                 currentMatchState.roundState = RoundState.IS_ROUND_END;
-                // TODO Take slot cards back into player hands with slot bonus
+                currentMatchState.playerAHands.cards = CollectBoardCardsWithBonusFromMatchState(currentMatchState, true);
+                currentMatchState.playerABoardSlots = [null, null, null, null, null, null];
+                currentMatchState.playerBHands.cards = CollectBoardCardsWithBonusFromMatchState(currentMatchState, false);
+                currentMatchState.playerBBoardSlots = [null, null, null, null, null, null];
                 break;
             }
             case RoundState.IS_ROUND_END: {

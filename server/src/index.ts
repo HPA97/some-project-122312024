@@ -4,7 +4,7 @@ import {
   ServerResponse, ServerResponseMatter,
   MatchState, RoundState,
   RoundStateTime, GameRules, Rules,
-  PlayerHand, Card,
+  PlayerHand, Card, CopyCard,
   CardSlotUpdate, CardSuit, CreateCard
 } from '../../common/types';
 
@@ -20,11 +20,8 @@ type ServerMatchState = {
   room: RoomType;
 }
 
-// UserId, UserInfo
 const userMap = new Map<String, UserType>();
-// UserId, Callback for room setup for clients
 const waitingUsers: Array<{ UserId: String, Callback: (responsePayload: ServerResponse) => void }> = Array();
-// RoomId, RoomInfo
 const roomInUse = new Map<String, RoomType>();
 
 let userCount = 0;
@@ -38,7 +35,7 @@ const OnConnection = (socket: Socket) => {
   userMap.set(socketId, { id: socketId, username: temporaryUsername })
 }
 
-io.on("connection", (socket) => {
+io.on("connection", (socket: Socket) => {
   OnConnection(socket);
 
   socket.on("register-user", (userId: String, username: String) => {
@@ -112,10 +109,10 @@ io.on("connection", (socket) => {
     const isPlayerA = playerId == room.playerA.id.toString();
     const matchState = room.matchState;
     if (isPlayerA) {
-      matchState.playerABoardSlots[slotUpdate.slotId] = slotUpdate.card;
+      matchState.playerABoardSlots[slotUpdate.slotId] = CopyCard(slotUpdate.card);
       matchState.playerAHands.cards = matchState.playerAHands.cards.filter((card) => card.id !== slotUpdate.card!.id);
     } else {
-      matchState.playerBBoardSlots[slotUpdate.slotId] = slotUpdate.card;
+      matchState.playerBBoardSlots[slotUpdate.slotId] = CopyCard(slotUpdate.card);
       matchState.playerBHands.cards = matchState.playerBHands.cards.filter((card) => card.id !== slotUpdate.card!.id);
     }
     //console.log("Room to update with: " + JSON.stringify(room));
