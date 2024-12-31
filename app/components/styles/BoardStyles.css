@@ -1,0 +1,28 @@
+/* Define reusable styles with Tailwind classes */
+.button {
+  @apply px-4 py-2 rounded-lg text-white transition focus:outline-none focus:ring;
+}
+
+.button-primary {
+  @apply bg-blue-500 hover:bg-blue-600 active:bg-blue-700 focus:ring-blue-300;
+}
+
+.button-secondary {
+  @apply bg-gray-500 hover:bg-gray-600 active:bg-gray-700 focus:ring-gray-300;
+}
+
+.heading {
+  @apply text-2xl font-bold mb-4;
+}
+
+.status-connected {
+  @apply text-green-600;
+}
+
+.status-disconnected {
+  @apply text-red-600;
+}
+
+.waiting-text {
+  @apply text-xl text-yellow-500 mt-4;
+}

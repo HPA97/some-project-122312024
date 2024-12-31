@@ -1,0 +1,25 @@
+FROM node:20
+
+# Copy the backend application and shared types
+COPY ./common/types.ts ./common/types.ts
+COPY ./server ./server
+
+# Set working directory
+WORKDIR /server
+
+# Copy package.json and lock files
+COPY package*.json ./
+
+COPY ./server/package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Install necessary global TypeScript tools
+#RUN npm install ts-node typescript -g
+
+# Expose the port for the backend
+EXPOSE 9000
+
+# Start the backend server
+CMD ["npm", "run", "dev"]
